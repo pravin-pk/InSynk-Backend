@@ -9,8 +9,8 @@
         <img id="logo" src="{% static 'images/chat-icon.png' %}"/>
 
         <div id="welcome-message">
-            <h1>Welcome to InSync</h1>
-            <p>A group video calling platform made just for you!</p>
+            <h1>Welcome to InSynk</h1>
+            <p>JOIN ROOM</p>
         </div>
 
         <form id="form">
@@ -39,19 +39,22 @@
 
     let handleSubmit = async (e) => {
         e.preventDefault()
-        let room = e.target.room.value.toUpperCase()
+        let room = e.target.room.value
         let name = e.target.name.value
 
-        let response = await fetch(`/get_token/?channel=${room}`)
+        let response = await fetch(`/fetch_room/?room_id=${room}`)
         let data = await response.json()
 
         let UID = data.uid
         let token = data.token
+        let room0 = data.room
+        let roomId = data.roomId
 
         sessionStorage.setItem('UID', UID)
         sessionStorage.setItem('token', token)
-        sessionStorage.setItem('room', room)
+        sessionStorage.setItem('room', room0)
         sessionStorage.setItem('name', name)
+        sessionStorage.setItem('roomId', roomId)
 
         window.open('/room/', '_self')
     }

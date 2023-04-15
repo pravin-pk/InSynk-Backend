@@ -1,9 +1,9 @@
 
-const APP_ID = ''
+const APP_ID = 'c8975345c00b4603a5eec4eb3c1cb3e5'
 const TOKEN = sessionStorage.getItem('token')
 const CHANNEL = sessionStorage.getItem('room')
+const ROOMID = sessionStorage.getItem('roomId')
 let UID = sessionStorage.getItem('UID')
-
 let NAME = sessionStorage.getItem('name')
 
 const client = AgoraRTC.createClient({mode:'rtc', codec:'vp8'})
@@ -12,7 +12,7 @@ let localTracks = []
 let remoteUsers = {}
 
 let joinAndDisplayLocalStream = async () => {
-    document.getElementById('room-name').innerText = CHANNEL
+    document.getElementById('room-name').innerText = ROOMID
 
     client.on('user-published', handleUserJoined)
     client.on('user-left', handleUserLeft)
@@ -21,7 +21,7 @@ let joinAndDisplayLocalStream = async () => {
         UID = await client.join(APP_ID, CHANNEL, TOKEN, UID)
     }catch(error){
         console.error(error)
-        window.open('/', '_self')
+        window.open('/errorInClient', '_self')
     }
     
     localTracks = await AgoraRTC.createMicrophoneAndCameraTracks()
@@ -109,7 +109,7 @@ let createMember = async () => {
         headers: {
             'Content-Type':'application/json'
         },
-        body:JSON.stringify({'name':NAME, 'room_name':CHANNEL, 'UID':UID})
+        body:JSON.stringify({'name':NAME, 'room_name':CHANNEL, 'UID':UID, 'roomId':ROOMID})
     })
     let member = await response.json()
     return member
@@ -117,7 +117,7 @@ let createMember = async () => {
 
 
 let getMember = async (user) => {
-    let response = await fetch(`/get_member/?UID=${user.uid}&room_name=${CHANNEL}`)
+    let response = await fetch(`/get_member/?UID=${user.uid}&room_id=${ROOMID}`)
     let member = await response.json()
     return member
 }
@@ -128,7 +128,7 @@ let deleteMember = async () => {
         headers: {
             'Content-Type':'application/json'
         },
-        body:JSON.stringify({'name':NAME, 'room_name':CHANNEL, 'UID':UID})
+        body:JSON.stringify({'name':NAME, 'room_id':ROOMID, 'UID':UID})
     })
     let member = await response.json()
 }

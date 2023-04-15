@@ -20,27 +20,44 @@ db = firestore.client()
 
 # Create your views here.
 
-def lobby(request):
-    return render(request, 'base/lobby.html')
+def create(request):
+    return render(request, 'base/create.html')
+
+def join(request):
+    return render(request, 'base/join.html')
 
 def room(request):
     return render(request, 'base/room.html')
 
-
-def getToken(request):
+def generateToken(channelName):
     appId = os.environ.get('AGORA_APP_ID')
     appCertificate = os.environ.get('AGORA_APP_CERTIFICATE')
-    channelName = request.GET.get('channel')
-    uid = random.randint(1, 257)
+    uid = f'usr-{random.randint(1, 257)}'
     expirationTimeInSeconds = 3600
     currentTimeStamp = int(time.time())
+    roomId = f'{channelName}-{currentTimeStamp}'
     # uid = f'{channelName}-{currentTimeStamp}'
     privilegeExpiredTs = currentTimeStamp + expirationTimeInSeconds
     role = 1
 
     token = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, channelName, uid, role, privilegeExpiredTs)
 
-    return JsonResponse({'token': token, 'uid': uid}, safe=False)
+    return token, uid, roomId
+
+def getToken(request):
+    channelName = request.GET.get('channel')
+    token, uid, roomId = generateToken(channelName)
+    # print(token, uid, roomId, " = getToken")
+
+    return JsonResponse({'token': token, 'uid': uid, 'roomId': roomId}, safe=False)
+
+def fetchRoom(request):
+    roomId = request.GET.get('room_id')
+    channelName = roomId.split('-')[0]
+    token, uid, _ = generateToken(channelName)
+    # print(token, uid, roomId, " = fetchRoom")
+
+    return JsonResponse({'token': token, 'uid': uid, 'roomId': roomId, 'room': channelName}, safe=False)
 
 
 @csrf_exempt
@@ -53,20 +70,20 @@ def createMember(request):
         "inSession": True
     }
     # doc = f'{data["UID"]}-{int(time.time())}'
-    db.collection(u'RoomMembers').document(data['UID']).set(member)
+    db.collection(u'RoomMembers').document('PK').collection(data['roomId']).document(data['UID']).set(member)
     return JsonResponse({'name':data['name']}, safe=False)
 
 
 def getMember(request):
     uid = request.GET.get('UID')
-    room_name = request.GET.get('room_name')
+    roomId = request.GET.get('room_id')
 
-    member = db.collection(u'RoomMembers').document(uid).get().to_dict()
+    member = db.collection(u'RoomMembers').document('PK').collection(roomId).document(uid).get().to_dict()
 
     return JsonResponse({'name':member.get('name')}, safe=False)
 
 @csrf_exempt
 def deleteMember(request):
     data = json.loads(request.body)
-    db.collection(u'RoomMembers').document(data['UID']).update({'inSession': False})
+    db.collection(u'RoomMembers').document('PK').collection(data['room_id']).document(data['UID']).update({'inSession': False})
     return JsonResponse('Member deleted', safe=False)
