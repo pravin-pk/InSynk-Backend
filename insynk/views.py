@@ -47,7 +47,7 @@ def generateToken(channelName):
 def getToken(request):
     channelName = request.GET.get('channel')
     token, uid, roomId = generateToken(channelName)
-    # print(token, uid, roomId, " = getToken")
+    print(token, uid, roomId, " = getToken")
 
     return JsonResponse({'token': token, 'uid': uid, 'roomId': roomId}, safe=False)
 
@@ -55,7 +55,7 @@ def fetchRoom(request):
     roomId = request.GET.get('room_id')
     channelName = roomId.split('-')[0]
     token, uid, _ = generateToken(channelName)
-    # print(token, uid, roomId, " = fetchRoom")
+    print(token, uid, roomId, " = fetchRoom")
 
     return JsonResponse({'token': token, 'uid': uid, 'roomId': roomId, 'room': channelName}, safe=False)
 

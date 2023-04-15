@@ -15,6 +15,7 @@ let joinAndDisplayLocalStream = async () => {
     document.getElementById('room-name').innerText = ROOMID
 
     client.on('user-published', handleUserJoined)
+    // handleUserJoined(UID, 'video')
     client.on('user-left', handleUserLeft)
 
     try{
@@ -40,6 +41,7 @@ let joinAndDisplayLocalStream = async () => {
 
 let handleUserJoined = async (user, mediaType) => {
     remoteUsers[user.uid] = user
+    console.log(user.uid)
     await client.subscribe(user, mediaType)
 
     if (mediaType === 'video'){
