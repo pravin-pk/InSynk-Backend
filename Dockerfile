@@ -16,4 +16,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 WORKDIR $APP_HOME/
-CMD exec gunicorn --bind 8000:8000 --workers 1 --threads 8 --timeout 0 hackverse_4.wsgi:application
+CMD exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0 hackverse_4.wsgi:application

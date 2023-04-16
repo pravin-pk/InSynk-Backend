@@ -89,14 +89,14 @@ def deleteMember(request):
     db.collection(u'RoomMembers').document('PK').collection(data['room_id']).document(data['UID']).update({'inSession': False})
     return JsonResponse('Member deleted', safe=False)
 
-
+@csrf_exempt
 def signUp(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
         userType = request.POST.get('userType')
-        db.collection(u'Users').document(username).set({
+        db.collection(u'Users').document(email).set({
             'username': username,
             'email': email,
             'password': password,
@@ -104,12 +104,12 @@ def signUp(request):
         })
         return JsonResponse("User created", safe=False)
     
-
+@csrf_exempt
 def signIn(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
-        user = db.collection(u'Users').document(username).get().to_dict()
+        user = db.collection(u'Users').document(email).get().to_dict()
         if user:
             if user.get('password') == password:
                 return JsonResponse({'user': user}, safe=False)
