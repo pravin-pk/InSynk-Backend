@@ -25,7 +25,9 @@ Provided in requirements.txt
 python manage.py runserver
 ```
 To deploy in GCP, please use the following 
-
+* note: Provided google console CLI is present in the system
 ```bash
-
+gcloud config set project insynk-hackverse
+gcloud run deploy
 ```
+* Follow the instructions as prompted
