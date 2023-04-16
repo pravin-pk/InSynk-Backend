@@ -24,3 +24,8 @@ Provided in requirements.txt
 ```bash
 python manage.py runserver
 ```
+To deploy in GCP, please use the following 
+
+```bash
+
+```
